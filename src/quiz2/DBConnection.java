@@ -14,23 +14,28 @@ import java.sql.SQLException;
 public class DBConnection {
     private static Connection con;
 
-    public void getDBConn() {
-        synchronized ("") {
+    public synchronized Connection getDBConn() {
             try {
-                if (this.getCon() == null || this.getCon().isClosed()) {
+                if (getCon() == null || getCon().isClosed()) {
                     try {
-                        String url = "jdbc:mysql://localhost:3307/oop_quiz2";     
-                        Class.forName("com.mysql.cj.jdbc.Driver"); 
-                        setCon(DriverManager.getConnection(url, "root", ""));
+                        String url = "jdbc:mysql://sql.freedb.tech:3306/freedb_quiz_2_oop?zeroDateTimeBehavior=CONVERT_TO_NULL";
+                        String user = "freedb_quiz_dev_user";
+                        String password = "9??5kZN@Exs5r#A";
+//                        Class.forName("com.mysql.cj.jdbc.Driver");
+//                        Class.forName(com.mysql.jdbc.Driver, );
+                        setCon(DriverManager.getConnection(url, user, password));
+                        
+                        return getCon();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } else {
                 }
+                
+                return getCon();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
-        }
+        return null;
     }
     
         /**

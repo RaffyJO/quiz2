@@ -1,6 +1,9 @@
 package quiz2;
 
+import java.awt.Component;
 import java.awt.Font;
+import java.awt.Image;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,9 +12,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -36,17 +44,44 @@ public class JFrameCashier extends javax.swing.JFrame {
     }
     private static void connect(){
         if(connection == null){
-            try {
-                String url = "jdbc:mysql://localhost:3307/oop_quiz2";
-                String user = "root";
-                String password = "";
-
-                connection = DriverManager.getConnection(url, user, password);
-            } catch (SQLException t) {
-                System.out.println("Koneksi Error " + t);
-            }
+            connection = new DBConnection().getDBConn();
         }
     }
+    
+    // Custom TableCellRenderer to display scaled images from URLs in the table cells
+    private static class ImageRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel label = new JLabel();
+            if (value != null) {
+                String imageURL = value.toString();
+                ImageIcon imageIcon = createImageIcon(imageURL);
+                if (imageIcon != null) {
+                    Image scaledImage = imageIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                    ImageIcon scaledIcon = new ImageIcon(scaledImage);
+                    label.setIcon(scaledIcon);
+                } else {
+                    label.setText("Image not found");
+                }
+            } else {
+                label.setText("");
+            }
+            return label;
+        }
+
+        // Method to create an ImageIcon from the URL
+        private ImageIcon createImageIcon(String imageURL) {
+            try {
+                URL url = new URL(imageURL);
+                Image image = ImageIO.read(url);
+                return new ImageIcon(image);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+    
     public void initMenu(){
         menuTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         menuTable.setFont(new Font("Arial", Font.PLAIN,14));
@@ -74,8 +109,17 @@ public class JFrameCashier extends javax.swing.JFrame {
             
             while(result.next()){
                 Object[] o = new Object[5];
-                o[0] = result.getInt("product_id"); 
-                o[1] = new ImageIcon("../"+result.getString("img_dir"));
+                String imagePath = result.getString("img_dir");
+                if (imagePath == null) imagePath = "img/QuestionMark.png";
+                
+                String imageCompletePath = getClass().getResource("../" + imagePath).toExternalForm();
+                
+                System.out.print(imagePath);
+                
+//                URL imageUrl = getClass().getResource("../assets/1_Ayam Goreng.jpg");
+                
+                o[0] = result.getInt("product_id");
+                o[1] = new ImageIcon(imageCompletePath);
                 o[2] = result.getString("product_name");
                 o[3] = result.getString("category");
                 o[4] = result.getInt("price");
@@ -85,6 +129,9 @@ public class JFrameCashier extends javax.swing.JFrame {
             state.close();
             
             menuTable.removeColumn(menuTable.getColumn("Id"));
+            
+            menuTable.getColumnModel().getColumn(0).setCellRenderer(new ImageRenderer()); // Set renderer for the image column
+            menuTable.getColumnModel().getColumn(0).setWidth(100);
            
             
             
@@ -240,36 +287,31 @@ public class JFrameCashier extends javax.swing.JFrame {
         totalLabel.setText("0");
 
         cashLabel.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
-        cashLabel.setText("jLabel8");
+        cashLabel.setText("0");
 
         changeLabel.setFont(new java.awt.Font("Stencil", 0, 24)); // NOI18N
-        changeLabel.setText("jLabel9");
+        changeLabel.setText("0");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(itemCount)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 220, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jLabel5))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel4))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(itemCount)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel3)))
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel3))
                 .addGap(26, 26, 26)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(cashLabel)
                     .addComponent(totalLabel)
                     .addComponent(changeLabel))
-                .addGap(40, 40, 40))
+                .addGap(73, 73, 73))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -424,7 +466,7 @@ public class JFrameCashier extends javax.swing.JFrame {
                         .addContainerGap())
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(26, Short.MAX_VALUE)
+                .addContainerGap(38, Short.MAX_VALUE)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -467,6 +509,7 @@ public class JFrameCashier extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        menuTable.setRowHeight(100);
         menuTable.getTableHeader().setReorderingAllowed(false);
         menuTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -581,7 +624,7 @@ public class JFrameCashier extends javax.swing.JFrame {
                         (int) OrderModel.getValueAt(row, 2) * (int) OrderModel.getValueAt(row, 3)
                         , row, 4);
                 modifyItemCount(1);
-                modifyTotal((int) OrderModel.getValueAt(row, 2));
+                modifyTotal(OrderModel.getRowCount());
         }
         
     }//GEN-LAST:event_orderIncActionPerformed
@@ -590,11 +633,15 @@ public class JFrameCashier extends javax.swing.JFrame {
         // TODO add your handling code here:
         int row = orderTable.getSelectedRow();
         
-        if(row != -1){
-            modifyTotal((int) OrderModel.getValueAt(row, 2) * (int) OrderModel.getValueAt(row, 3) * -1);
-            modifyItemCount((int) OrderModel.getValueAt(row, 3) * -1);
-            OrderModel.removeRow(row);
-        }
+        if (row == -1) return;
+        
+        System.err.println(OrderModel.getRowCount());
+        
+        OrderModel.removeRow(row);
+        
+        modifyTotal((int) OrderModel.getValueAt(row, 2) * (int) OrderModel.getValueAt(row, 3) * -1);
+//        modifyItemCount((int) OrderModel.getValueAt(row, 3) * -1);
+        itemCount.setText(Integer.toString(OrderModel.getRowCount()));   
     }//GEN-LAST:event_orderRemoveActionPerformed
 
     private void orderDecrActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orderDecrActionPerformed
@@ -631,10 +678,25 @@ public class JFrameCashier extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_editFieldActionPerformed
 
+    private Object[][] getTableData(JTable table) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        int rowCount = model.getRowCount();
+        int columnCount = model.getColumnCount();
+        Object[][] data = new Object[rowCount][columnCount];
+
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < columnCount; j++) {
+                data[i][j] = model.getValueAt(i, j);
+            }
+        }
+        return data;
+    }
+    
     public void modifyItemCount(int n){
-        int temp = Integer.parseInt(itemCount.getText());
-        temp += n;
-        itemCount.setText(String.valueOf(temp));
+        itemCount.setText(Integer.toString(OrderModel.getRowCount()));
+//        for (int i = 1; i <= OrderModel.getRowCount(); i++) {
+//         itemCount.setText(Integer.toString(i));   
+//        }
     }
     public void modifyTotal(int n){
         int temp = Integer.parseInt(totalLabel.getText());
@@ -709,4 +771,19 @@ public class JFrameCashier extends javax.swing.JFrame {
     private javax.swing.JTable orderTable;
     private javax.swing.JLabel totalLabel;
     // End of variables declaration//GEN-END:variables
+}
+
+class ImageRenderer extends DefaultTableCellRenderer {
+    JLabel lbl = new JLabel();
+    String path = "/home/tereza/Codes/Java/NETBEANS/quiz2/src/img/1_Ayam Goreng.jpg";
+
+  ImageIcon icon = new ImageIcon(getClass().getResource(path));
+
+    @Override
+  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+      boolean hasFocus, int row, int column) {
+    lbl.setText((String) value);
+    lbl.setIcon(icon);
+    return lbl;
+  }
 }
