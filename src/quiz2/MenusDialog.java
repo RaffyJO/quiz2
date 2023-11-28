@@ -58,6 +58,7 @@ public class MenusDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Menus");
+        setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(51, 153, 255));
 
@@ -80,6 +81,11 @@ public class MenusDialog extends javax.swing.JDialog {
         );
 
         addButton.setText("Add");
+        addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButtonActionPerformed(evt);
+            }
+        });
 
         updateButton.setText("Update");
 
@@ -140,12 +146,16 @@ public class MenusDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_addButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -209,7 +219,9 @@ public class MenusDialog extends javax.swing.JDialog {
         MenuModel.addColumn("Name");
         MenuModel.addColumn("Category");
         MenuModel.addColumn("Price");
+        MenuModel.addColumn("Category");
         menusTable.setModel(MenuModel);
+        
         try {
 
             String sql = "select * from product";
@@ -224,13 +236,16 @@ public class MenusDialog extends javax.swing.JDialog {
                 dataContainer[1] = result.getString("product_name");
                 dataContainer[2] = result.getString("category");
                 dataContainer[3] = result.getInt("price");
+                dataContainer[4] = result.getString("category");
+                
+                Logger.getLogger(this.getName()).log(Level.INFO, result.getString("category"));
 
                 MenuModel.addRow(dataContainer);
             }
             result.close();
             state.close();
         } catch (Exception ex) {
-            Logger.getLogger(JFrameCashier.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(this.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
