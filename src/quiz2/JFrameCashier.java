@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -83,6 +84,8 @@ public class JFrameCashier extends javax.swing.JFrame {
     }
     
     public void initMenu(){
+        this.setJMenuBar(UtilitiesMenuBar);
+        MenusDialog = new MenusDialog(this, rootPaneCheckingEnabled);
         menuTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         menuTable.setFont(new Font("Arial", Font.PLAIN,14));
         menuTable.getTableHeader().setFont(new Font("Arial",Font.BOLD, 16)) ;
@@ -179,6 +182,10 @@ public class JFrameCashier extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         editField = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        UtilitiesMenuBar = new javax.swing.JMenuBar();
+        Utils = new javax.swing.JMenu();
+        Menus = new javax.swing.JMenuItem();
+        jScrollPane2 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -261,6 +268,18 @@ public class JFrameCashier extends javax.swing.JFrame {
             .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        Utils.setText("Utils");
+
+        Menus.setText("Menus");
+        Menus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenusActionPerformed(evt);
+            }
+        });
+        Utils.add(Menus);
+
+        UtilitiesMenuBar.add(Utils);
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
@@ -301,7 +320,7 @@ public class JFrameCashier extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(itemCount)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 220, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel5)
                     .addComponent(jLabel4)
@@ -460,13 +479,13 @@ public class JFrameCashier extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(26, 26, 26)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(38, Short.MAX_VALUE)
+                .addContainerGap(45, Short.MAX_VALUE)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -557,15 +576,17 @@ public class JFrameCashier extends javax.swing.JFrame {
                 .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jScrollPane2.setViewportView(jPanel1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1245, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 853, Short.MAX_VALUE)
         );
 
         pack();
@@ -687,6 +708,10 @@ public class JFrameCashier extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_editFieldActionPerformed
 
+    private void MenusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenusActionPerformed
+        MenusDialog.setVisible(true);
+    }//GEN-LAST:event_MenusActionPerformed
+
     private Object[][] getTableData(JTable table) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         int rowCount = model.getRowCount();
@@ -749,6 +774,9 @@ public class JFrameCashier extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDialog EditDialog;
+    private javax.swing.JMenuItem Menus;
+    private javax.swing.JMenuBar UtilitiesMenuBar;
+    private javax.swing.JMenu Utils;
     private javax.swing.JLabel cashLabel;
     private javax.swing.JLabel changeLabel;
     private javax.swing.JTextField editField;
@@ -771,6 +799,7 @@ public class JFrameCashier extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable menuTable;
     private javax.swing.JButton orderDecr;
@@ -780,6 +809,7 @@ public class JFrameCashier extends javax.swing.JFrame {
     private javax.swing.JTable orderTable;
     private javax.swing.JLabel totalLabel;
     // End of variables declaration//GEN-END:variables
+    private JDialog MenusDialog;
 }
 
 class ImageRenderer extends DefaultTableCellRenderer {
