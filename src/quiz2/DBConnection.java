@@ -18,9 +18,9 @@ public class DBConnection {
             try {
                 if (getCon() == null || getCon().isClosed()) {
                     try {
-                        String url = "jdbc:mysql://localhost:3307/oop_quiz2";
-                        String user = "root";
-                        String password = "";
+                        String url = "jdbc:mysql://sql.freedb.tech:3306/freedb_quiz_2_oop?zeroDateTimeBehavior=CONVERT_TO_NULL";
+                        String user = "freedb_quiz_dev_user";
+                        String password = "9??5kZN@Exs5r#A";
 //                        Class.forName("com.mysql.cj.jdbc.Driver");
 //                        Class.forName(com.mysql.jdbc.Driver, );
                         setCon(DriverManager.getConnection(url, user, password));
