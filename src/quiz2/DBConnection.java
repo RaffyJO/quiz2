@@ -18,7 +18,7 @@ public class DBConnection {
             try {
                 if (getCon() == null || getCon().isClosed()) {
                     try {
-                        String url = "jdbc:mysql://localhost:3307/oop_quiz2";
+                        String url = "jdbc:mysql://localhost:3306/oop_quiz2";
                         String user = "root";
                         String password = "";
 //                        Class.forName("com.mysql.cj.jdbc.Driver");
