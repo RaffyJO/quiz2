@@ -572,7 +572,16 @@ public class JFrameCashier extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
+        //Ganti teks
+        itemCount.setText("0");
+        totalLabel.setText("0");
+        changeLabel.setText("0");
+        cashLabel.setText("0");
+        
+        //Kosongi orderTable
+        for(int i = 0; i < OrderModel.getRowCount(); i += 0){
+            OrderModel.removeRow(i);
+        }
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void menuTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuTableMouseClicked
@@ -624,7 +633,7 @@ public class JFrameCashier extends javax.swing.JFrame {
                         (int) OrderModel.getValueAt(row, 2) * (int) OrderModel.getValueAt(row, 3)
                         , row, 4);
                 modifyItemCount(1);
-                modifyTotal(OrderModel.getRowCount());
+                modifyTotal((int) OrderModel.getValueAt(row, 2) * 1);
         }
         
     }//GEN-LAST:event_orderIncActionPerformed
@@ -637,9 +646,9 @@ public class JFrameCashier extends javax.swing.JFrame {
         
         System.err.println(OrderModel.getRowCount());
         
+        modifyTotal((int) OrderModel.getValueAt(row, 2) * (int) OrderModel.getValueAt(row, 3) * -1);
         OrderModel.removeRow(row);
         
-        modifyTotal((int) OrderModel.getValueAt(row, 2) * (int) OrderModel.getValueAt(row, 3) * -1);
 //        modifyItemCount((int) OrderModel.getValueAt(row, 3) * -1);
         itemCount.setText(Integer.toString(OrderModel.getRowCount()));   
     }//GEN-LAST:event_orderRemoveActionPerformed
