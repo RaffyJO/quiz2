@@ -10,6 +10,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -33,11 +35,17 @@ import javax.swing.table.TableModel;
  */
 public class JFrameCashier extends javax.swing.JFrame {
     private static Connection connection;
-    private DefaultTableModel OrderModel, MenuModel;
-
-    /**
-     * Creates new form JFrameCashier
-     */
+    private DefaultTableModel OrderModel, MenuModel, InvoiceModel;
+    
+    public int SESSION_USERID;
+    
+    public void setSession(int uid){
+        this.SESSION_USERID = uid;
+    }
+    public int getSession(){
+        return this.SESSION_USERID;
+    }
+    
     public JFrameCashier() {
         initComponents();
         initMenu();
@@ -135,6 +143,8 @@ public class JFrameCashier extends javax.swing.JFrame {
             
             menuTable.getColumnModel().getColumn(0).setCellRenderer(new ImageRenderer()); // Set renderer for the image column
             menuTable.getColumnModel().getColumn(0).setWidth(100);
+            
+            menuTable.removeColumn(menuTable.getColumn("Image"));
            
             
             
@@ -167,6 +177,7 @@ public class JFrameCashier extends javax.swing.JFrame {
         orderTable.removeColumn(orderTable.getColumn("Id"));
         
     }
+    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -212,14 +223,26 @@ public class JFrameCashier extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         menuTable = new javax.swing.JTable();
         jLabel10 = new javax.swing.JLabel();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        cashierTab = new javax.swing.JMenu();
+        invoiceTab = new javax.swing.JMenu();
+        jMenu3 = new javax.swing.JMenu();
+
+        EditDialog.setModal(true);
+        EditDialog.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jPanel7.setMinimumSize(getPreferredSize());
+        jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel6.setText("Change Quantity");
+        jPanel7.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 50, -1, -1));
 
         editField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editFieldActionPerformed(evt);
             }
         });
+        jPanel7.add(editField, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, 240, -1));
 
         jButton1.setText("Confirm");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -227,46 +250,9 @@ public class JFrameCashier extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
+        jPanel7.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 130, -1, -1));
 
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addGap(216, 216, 216)
-                        .addComponent(jLabel6))
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addGap(106, 106, 106)
-                        .addComponent(editField, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addGap(225, 225, 225)
-                        .addComponent(jButton1)))
-                .addContainerGap(112, Short.MAX_VALUE))
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addGap(55, 55, 55)
-                .addComponent(jLabel6)
-                .addGap(18, 18, 18)
-                .addComponent(editField, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 70, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(64, 64, 64))
-        );
-
-        javax.swing.GroupLayout EditDialogLayout = new javax.swing.GroupLayout(EditDialog.getContentPane());
-        EditDialog.getContentPane().setLayout(EditDialogLayout);
-        EditDialogLayout.setHorizontalGroup(
-            EditDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        EditDialogLayout.setVerticalGroup(
-            EditDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+        EditDialog.getContentPane().add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 320, 220));
 
         Utils.setText("Utils");
 
@@ -498,7 +484,7 @@ public class JFrameCashier extends javax.swing.JFrame {
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(42, 42, 42))
         );
@@ -541,11 +527,11 @@ public class JFrameCashier extends javax.swing.JFrame {
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
 
         jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
@@ -575,8 +561,28 @@ public class JFrameCashier extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
+      
         jScrollPane2.setViewportView(jPanel1);
+        cashierTab.setText("Cashier");
+        cashierTab.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                cashierTabMouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(cashierTab);
+
+        invoiceTab.setText("Invoices");
+        invoiceTab.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                invoiceTabMouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(invoiceTab);
+
+        jMenu3.setText("CRUD");
+        jMenuBar1.add(jMenu3);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -697,11 +703,14 @@ public class JFrameCashier extends javax.swing.JFrame {
 
     private void orderEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orderEditActionPerformed
         // TODO add your handling code here:
+        EditDialog.setSize(EditDialog.getPreferredSize());
         EditDialog.setVisible(true);
+        
     }//GEN-LAST:event_orderEditActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void editFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editFieldActionPerformed
@@ -718,13 +727,24 @@ public class JFrameCashier extends javax.swing.JFrame {
         int columnCount = model.getColumnCount();
         Object[][] data = new Object[rowCount][columnCount];
 
-        for (int i = 0; i < rowCount; i++) {
-            for (int j = 0; j < columnCount; j++) {
-                data[i][j] = model.getValueAt(i, j);
-            }
-        }
-        return data;
-    }
+    private void invoiceTabMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_invoiceTabMouseClicked
+        // TODO add your handling code here:
+        JDialogInvoice invoice = new JDialogInvoice();
+            invoice.setSession(this.getSession());
+            invoice.setVisible(true);
+            this.dispose();
+    }//GEN-LAST:event_invoiceTabMouseClicked
+
+    private void cashierTabMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cashierTabMouseClicked
+        // TODO add your handling code here:
+        JFrameCashier cashier = new JFrameCashier();
+        cashier.setSession(this.getSession());
+        cashier.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_cashierTabMouseClicked
+
+    
+    
     
     public void modifyItemCount(int n){
         itemCount.setText(Integer.toString(OrderModel.getRowCount()));
@@ -778,8 +798,10 @@ public class JFrameCashier extends javax.swing.JFrame {
     private javax.swing.JMenuBar UtilitiesMenuBar;
     private javax.swing.JMenu Utils;
     private javax.swing.JLabel cashLabel;
+    private javax.swing.JMenu cashierTab;
     private javax.swing.JLabel changeLabel;
     private javax.swing.JTextField editField;
+    private javax.swing.JMenu invoiceTab;
     private javax.swing.JLabel itemCount;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton5;
@@ -791,6 +813,8 @@ public class JFrameCashier extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
