@@ -4,7 +4,9 @@
  */
 package componentss;
 
+import Models.Product;
 import componentss.Menus.addMenu;
+import componentss.Menus.updateMenu;
 import java.awt.Font;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -24,6 +26,8 @@ public class MenusDialog extends javax.swing.JDialog {
     private static Connection connection;
     private DefaultTableModel MenuModel;
     private java.awt.Frame parent;
+    private Product selectedProduct;
+
     /**
      * Creates new form MenusDialog
      */
@@ -49,6 +53,7 @@ public class MenusDialog extends javax.swing.JDialog {
         addButton = new javax.swing.JButton();
         updateButton = new javax.swing.JButton();
         deleteButton = new javax.swing.JButton();
+        reloadButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         menusTable = new javax.swing.JTable();
 
@@ -88,8 +93,27 @@ public class MenusDialog extends javax.swing.JDialog {
         });
 
         updateButton.setText("Update");
+        updateButton.setEnabled(false);
+        updateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateButtonActionPerformed(evt);
+            }
+        });
 
         deleteButton.setText("Delete");
+        deleteButton.setEnabled(false);
+        deleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteButtonActionPerformed(evt);
+            }
+        });
+
+        reloadButton.setText("Reload");
+        reloadButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reloadButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -102,7 +126,9 @@ public class MenusDialog extends javax.swing.JDialog {
                 .addComponent(updateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(deleteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(reloadButton, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -111,7 +137,8 @@ public class MenusDialog extends javax.swing.JDialog {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(addButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(updateButton)
-                    .addComponent(deleteButton))
+                    .addComponent(deleteButton)
+                    .addComponent(reloadButton))
                 .addContainerGap())
         );
 
@@ -126,6 +153,13 @@ public class MenusDialog extends javax.swing.JDialog {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        menusTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        menusTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        menusTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                menusTableMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(menusTable);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -155,6 +189,41 @@ public class MenusDialog extends javax.swing.JDialog {
         new addMenu(parent, rootPaneCheckingEnabled).setVisible(true);
     }//GEN-LAST:event_addButtonActionPerformed
 
+    private void menusTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menusTableMouseClicked
+        int row = menusTable.getSelectedRow();
+
+        if (row == -1) {
+            return;
+        }
+
+        int id = Integer.parseInt(MenuModel.getValueAt(row, 0).toString());
+        String name = MenuModel.getValueAt(row, 1).toString();
+        int price = Integer.parseInt(MenuModel.getValueAt(row, 2).toString());
+        String category = MenuModel.getValueAt(row, 3).toString();
+
+        selectedProduct = new Product(id, name, price, category);
+
+        if (selectedProduct != null) {
+            updateButton.setEnabled(true);
+            deleteButton.setEnabled(true);
+        } else {
+            updateButton.setEnabled(false);
+            deleteButton.setEnabled(false);
+        }
+    }//GEN-LAST:event_menusTableMouseClicked
+
+    private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
+        new updateMenu(parent, rootPaneCheckingEnabled, selectedProduct).setVisible(true);
+    }//GEN-LAST:event_updateButtonActionPerformed
+
+    private void reloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadButtonActionPerformed
+        initTable();
+    }//GEN-LAST:event_reloadButtonActionPerformed
+
+    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
+        new deleteMenu(parent, rootPaneCheckingEnabled, selectedProduct).setVisible(true);
+    }//GEN-LAST:event_deleteButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -169,16 +238,24 @@ public class MenusDialog extends javax.swing.JDialog {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MenusDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MenusDialog.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MenusDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MenusDialog.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MenusDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MenusDialog.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MenusDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MenusDialog.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -196,7 +273,7 @@ public class MenusDialog extends javax.swing.JDialog {
             }
         });
     }
-    
+
     private void initTable() {
         menusTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         menusTable.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -205,14 +282,13 @@ public class MenusDialog extends javax.swing.JDialog {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false; // Generated from
-                              // nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+                // nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
             }
 
         };
 
         MenuModel.addColumn("Id");
         MenuModel.addColumn("Name");
-        MenuModel.addColumn("Category");
         MenuModel.addColumn("Price");
         MenuModel.addColumn("Category");
         menusTable.setModel(MenuModel);
@@ -225,13 +301,12 @@ public class MenusDialog extends javax.swing.JDialog {
             ResultSet result = state.executeQuery(sql);
 
             while (result.next()) {
-                Object[] dataContainer = new Object[5];
+                Object[] dataContainer = new Object[4];
 
                 dataContainer[0] = result.getInt("product_id");
                 dataContainer[1] = result.getString("product_name");
-                dataContainer[2] = result.getString("category");
-                dataContainer[3] = result.getInt("price");
-                dataContainer[4] = result.getString("category");
+                dataContainer[2] = result.getInt("price");
+                dataContainer[3] = result.getString("category");
 
                 MenuModel.addRow(dataContainer);
             }
@@ -256,6 +331,7 @@ public class MenusDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable menusTable;
+    private javax.swing.JButton reloadButton;
     private javax.swing.JButton updateButton;
     // End of variables declaration//GEN-END:variables
 }
