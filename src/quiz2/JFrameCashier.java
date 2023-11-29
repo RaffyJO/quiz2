@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -35,6 +36,8 @@ import javax.swing.table.TableModel;
 public class JFrameCashier extends javax.swing.JFrame {
     private static Connection connection;
     private DefaultTableModel OrderModel, MenuModel, InvoiceModel;
+    private static int change;
+    private static int cash;
     
     public int SESSION_USERID;
     
@@ -205,7 +208,7 @@ public class JFrameCashier extends javax.swing.JFrame {
         changeLabel = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
+        paymentButton = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         orderEdit = new javax.swing.JButton();
         orderDecr = new javax.swing.JButton();
@@ -331,9 +334,14 @@ public class JFrameCashier extends javax.swing.JFrame {
             }
         });
 
-        jButton6.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
-        jButton6.setForeground(new java.awt.Color(0, 51, 255));
-        jButton6.setText("Pay");
+        paymentButton.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
+        paymentButton.setForeground(new java.awt.Color(0, 51, 255));
+        paymentButton.setText("Pay");
+        paymentButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                paymentButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -343,7 +351,7 @@ public class JFrameCashier extends javax.swing.JFrame {
                 .addGap(78, 78, 78)
                 .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(paymentButton, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(92, 92, 92))
         );
         jPanel4Layout.setVerticalGroup(
@@ -352,7 +360,7 @@ public class JFrameCashier extends javax.swing.JFrame {
                 .addGap(25, 25, 25)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(paymentButton, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(30, Short.MAX_VALUE))
         );
 
@@ -571,7 +579,7 @@ public class JFrameCashier extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1204, Short.MAX_VALUE)
+            .addComponent(jScrollPane2)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -686,8 +694,44 @@ public class JFrameCashier extends javax.swing.JFrame {
 
     private void orderEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orderEditActionPerformed
         // TODO add your handling code here:
-        EditDialog.setSize(EditDialog.getPreferredSize());
-        EditDialog.setVisible(true);
+        int selectedRow = orderTable.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a row to edit.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int currentQty = (int) OrderModel.getValueAt(selectedRow, 3);
+
+        String editedQtyString = JOptionPane.showInputDialog(this, "Edit Quantity:", currentQty);
+
+        if (editedQtyString == null || editedQtyString.isEmpty()) {
+            return; 
+        }
+
+        try {
+            int editedQty = Integer.parseInt(editedQtyString);
+
+            OrderModel.setValueAt(editedQty, selectedRow, 3);
+
+            int price = (int) OrderModel.getValueAt(selectedRow, 2);
+            int updatedTotal = editedQty * price;
+            OrderModel.setValueAt(updatedTotal, selectedRow, 4);
+
+            int newTotal = 0;
+
+            for (int i = 0; i < OrderModel.getRowCount(); i++) {
+                int priceItem = (int) OrderModel.getValueAt(i, 2);
+                int quantity = (int) OrderModel.getValueAt(i, 3);
+                newTotal += priceItem * quantity;
+            }
+
+            totalLabel.setText(Integer.toString(newTotal));
+
+            modifyItemCount(0); 
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid integer for the quantity.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+        }
         
     }//GEN-LAST:event_orderEditActionPerformed
 
@@ -716,7 +760,37 @@ public class JFrameCashier extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_cashierTabMouseClicked
 
-    
+    private void paymentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paymentButtonActionPerformed
+        // TODO add your handling code here:
+        if(OrderModel.getRowCount() > 0){
+            JDialogPayment payment = new JDialogPayment(this, true, Integer.parseInt(totalLabel.getText()));
+            payment.setVisible(true);
+        }
+    }//GEN-LAST:event_paymentButtonActionPerformed
+
+    public void processTransaction(){
+        String sql = "INSERT INTO transaction(cashier_id) values("+ 1 +");";
+        
+        String sql2= "insert into transaction_detail(transaction_id, product_id, qty, total) values";
+            for(int i = 0; i < orderTable.getRowCount(); i++){
+                int product_id = (int) OrderModel.getValueAt(i, 0);
+                int qty = (int) OrderModel.getValueAt(i, 3);
+                int total = (int) OrderModel.getValueAt(i, 4);
+            
+                sql += " (LAST_INSERT_ID()," + product_id  + ","+ qty +" ,"+ total +")";
+                if(i < orderTable.getRowCount() - 1){
+                    sql += ",";
+                }
+            }
+            sql += ";";
+            try {
+                Statement state = connection.createStatement();
+                state.execute(sql);
+                state.execute(sql2);
+            } catch (SQLException ex) {
+                Logger.getLogger(JFrameCashier.class.getName()).log(Level.SEVERE, null, ex);
+            }
+    }
     
     
     public void modifyItemCount(int n){
@@ -730,6 +804,37 @@ public class JFrameCashier extends javax.swing.JFrame {
         temp += n;
         totalLabel.setText(String.valueOf(temp));
     }
+    
+    public void modifyCash(String n){
+        cashLabel.setText(n);
+    }
+    
+    public void modifyChange(String n){
+        changeLabel.setText(n);
+    }
+    
+//    public static int getChange() {
+//        return change;
+//    }
+//
+//    /**
+//     * @param aChange the change to set
+//     */
+//    public static void setChange(int aChange) {
+//        change = aChange;
+//    }
+//    
+//    public static int getCash() {
+//        return cash;
+//    }
+//
+//    /**
+//     * @param aChange the change to set
+//     */
+//    public static void setCash(int aCash) {
+//        change = aCash;
+//    }
+    
     /**
      * @param args the command line arguments
      */
@@ -775,7 +880,6 @@ public class JFrameCashier extends javax.swing.JFrame {
     private javax.swing.JLabel itemCount;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
@@ -801,6 +905,7 @@ public class JFrameCashier extends javax.swing.JFrame {
     private javax.swing.JButton orderInc;
     private javax.swing.JButton orderRemove;
     private javax.swing.JTable orderTable;
+    private javax.swing.JButton paymentButton;
     private javax.swing.JLabel totalLabel;
     // End of variables declaration//GEN-END:variables
 }
