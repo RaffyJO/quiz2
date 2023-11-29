@@ -116,7 +116,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jScrollPane2" alignment="0" pref="1204" max="32767" attributes="0"/>
+          <Component id="jScrollPane2" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -353,7 +353,7 @@
                               <EmptySpace min="-2" pref="78" max="-2" attributes="0"/>
                               <Component id="jButton5" min="-2" pref="170" max="-2" attributes="0"/>
                               <EmptySpace max="32767" attributes="0"/>
-                              <Component id="jButton6" min="-2" pref="170" max="-2" attributes="0"/>
+                              <Component id="paymentButton" min="-2" pref="170" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="92" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -364,7 +364,7 @@
                               <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="jButton5" alignment="3" min="-2" pref="57" max="-2" attributes="0"/>
-                                  <Component id="jButton6" alignment="3" min="-2" pref="57" max="-2" attributes="0"/>
+                                  <Component id="paymentButton" alignment="3" min="-2" pref="57" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace pref="30" max="32767" attributes="0"/>
                           </Group>
@@ -386,7 +386,7 @@
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton5ActionPerformed"/>
                       </Events>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jButton6">
+                    <Component class="javax.swing.JButton" name="paymentButton">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                           <Font name="Segoe UI" size="15" style="1"/>
@@ -396,6 +396,9 @@
                         </Property>
                         <Property name="text" type="java.lang.String" value="Pay"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="paymentButtonActionPerformed"/>
+                      </Events>
                     </Component>
                   </SubComponents>
                 </Container>
