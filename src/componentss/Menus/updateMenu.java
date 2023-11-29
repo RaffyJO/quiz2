@@ -297,7 +297,7 @@ public class updateMenu extends javax.swing.JDialog {
         boolean category = false;
 
         id = !idTextField.getText().isEmpty();
-        productName = !productTextField.getText().isBlank();
+        productName = !productTextField.getText().isEmpty();
         price = null != priceTextField.getValue() && isNumber(priceTextField.getValue().toString());
         category = categoryList.getSelectedValue() != null;
 
